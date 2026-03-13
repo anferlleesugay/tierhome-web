@@ -15,10 +15,12 @@ export default function App() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Splash />} />
+                <Route path="/splash" element={<Splash />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/properties" element={<PrivateRoute><Properties /></PrivateRoute>} />
                 <Route path="/add-property" element={<PrivateRoute><AddProperty /></PrivateRoute>} />
+                <Route path="*" element={<Navigate to="/" />} />
             </Routes>
         </BrowserRouter>
     );
