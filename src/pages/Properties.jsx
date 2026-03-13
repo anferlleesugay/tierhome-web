@@ -29,99 +29,152 @@ export default function Properties() {
     };
 
     const tierConfig = (tier) => {
-        if (tier === 'Optimal Fit') return { color:'#2d6a4f', bg:'#f0faf4', icon:'🟢' };
-        if (tier === 'Budget Stretch') return { color:'#b45309', bg:'#fffbeb', icon:'🟡' };
-        return { color:'#dc2626', bg:'#fff0f0', icon:'🔴' };
+        if (tier === 'Optimal Fit') return { color:'#0F6E56', bg:'#E1F5EE', label:'Optimal Fit' };
+        if (tier === 'Budget Stretch') return { color:'#854F0B', bg:'#FAEEDA', label:'Budget Stretch' };
+        return { color:'#A32D2D', bg:'#FCEBEB', label:'High Risk' };
+    };
+
+    const scoreColor = (tier) => {
+        if (tier === 'Optimal Fit') return '#1D9E75';
+        if (tier === 'Budget Stretch') return '#EF9F27';
+        return '#E24B4A';
     };
 
     return (
         <div style={styles.page}>
+            <style>{`
+                @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=DM+Sans:wght@300;400;500&display=swap');
+                @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+                @keyframes spin { to { transform: rotate(360deg); } }
+                .th-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.12) !important; }
+                .th-search-input:focus { outline: none; }
+                .th-logout:hover { background: #fef2f2 !important; color: #b91c1c !important; }
+            `}</style>
+
             {/* Navbar */}
             <nav style={styles.navbar}>
-                <div style={styles.navBrand}>🏠 TierHome</div>
+                <div style={styles.navBrand}>
+                    <div style={styles.navLogoBox}>🏠</div>
+                    <span style={styles.navLogoText}>Tier<em>Home</em></span>
+                </div>
+
+                <div style={styles.navCenter}>
+                    <div style={styles.navSearchBar}>
+                        <span style={styles.navSearchIcon}>₱</span>
+                        <input
+                            className="th-search-input"
+                            style={styles.navSearchInput}
+                            type="number"
+                            placeholder="Monthly budget..."
+                            value={budget}
+                            onChange={e => setBudget(e.target.value)}
+                            onKeyDown={e => e.key === 'Enter' && fetchProperties()}
+                        />
+                        <button style={styles.navSearchBtn} onClick={fetchProperties}>
+                            Search
+                        </button>
+                    </div>
+                </div>
+
                 <div style={styles.navRight}>
-                    <div style={styles.userBadge}>
-                        <span style={styles.userAvatar}>{user?.name?.charAt(0)}</span>
-                        <div>
+                    <div style={styles.userPill}>
+                        <div style={styles.userAvatar}>{user?.name?.charAt(0)?.toUpperCase()}</div>
+                        <div style={styles.userInfo}>
                             <div style={styles.userName}>{user?.name}</div>
                             <div style={styles.userRole}>{user?.role}</div>
                         </div>
                     </div>
-                    <button style={styles.logoutBtn} onClick={handleLogout}>Logout</button>
+                    <button className="th-logout" style={styles.logoutBtn} onClick={handleLogout}>
+                        Logout
+                    </button>
                 </div>
             </nav>
 
-            {/* Hero Search */}
+            {/* Hero */}
             <div style={styles.hero}>
-                <h1 style={styles.heroTitle}>Find Your Perfect Home</h1>
-                <p style={styles.heroSubtitle}>Enter your budget and we'll rank properties that fit your lifestyle</p>
-                <div style={styles.searchBox}>
-                    <span style={styles.searchIcon}>₱</span>
-                    <input
-                        style={styles.searchInput}
-                        type="number"
-                        placeholder="Enter your monthly budget..."
-                        value={budget}
-                        onChange={e => setBudget(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && fetchProperties()}
-                    />
-                    <button style={styles.searchBtn} onClick={fetchProperties}>
-                        Search
-                    </button>
-                </div>
-
-                {/* Tier Legend */}
-                <div style={styles.legend}>
-                    <span style={styles.legendItem}><span style={{color:'#2d6a4f'}}>🟢</span> Optimal Fit</span>
-                    <span style={styles.legendItem}><span style={{color:'#b45309'}}>🟡</span> Budget Stretch</span>
-                    <span style={styles.legendItem}><span style={{color:'#dc2626'}}>🔴</span> High Risk</span>
+                <div style={styles.heroInner}>
+                    <h1 style={styles.heroTitle}>
+                        Your budget,{' '}
+                        <span style={styles.heroAccent}>perfectly matched.</span>
+                    </h1>
+                    <p style={styles.heroSub}>
+                        {budget
+                            ? `Showing ${properties.length} properties ranked for ₱${Number(budget).toLocaleString()} / month`
+                            : 'Enter your budget above to see personalized rankings'}
+                    </p>
+                    <div style={styles.tierLegend}>
+                        <span style={styles.legendItem}>
+                            <span style={{...styles.legendDot, background:'#1D9E75'}}></span>Optimal Fit
+                        </span>
+                        <span style={styles.legendItem}>
+                            <span style={{...styles.legendDot, background:'#EF9F27'}}></span>Budget Stretch
+                        </span>
+                        <span style={styles.legendItem}>
+                            <span style={{...styles.legendDot, background:'#E24B4A'}}></span>High Risk
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            {/* Results */}
+            {/* Content */}
             <div style={styles.content}>
                 {loading ? (
-                    <div style={styles.loadingWrapper}>
-                        <div style={styles.loadingSpinner}></div>
-                        <p style={styles.loadingText}>Finding properties...</p>
+                    <div style={styles.loadingWrap}>
+                        <div style={styles.spinner}></div>
+                        <p style={styles.loadingText}>Finding your perfect match...</p>
                     </div>
                 ) : properties.length === 0 ? (
-                    <div style={styles.emptyState}>
-                        <p style={styles.emptyIcon}>🏚️</p>
-                        <h3>No properties found</h3>
-                        <p style={{color:'#888'}}>Try adjusting your budget or check back later.</p>
+                    <div style={styles.emptyWrap}>
+                        <div style={styles.emptyIcon}>🏚️</div>
+                        <h3 style={styles.emptyTitle}>No properties found</h3>
+                        <p style={styles.emptyText}>Try a different budget or check back later.</p>
                     </div>
                 ) : (
-                    <>
-                        <p style={styles.resultsCount}>{properties.length} properties found {budget ? `for ₱${Number(budget).toLocaleString()} budget` : ''}</p>
-                        <div style={styles.grid}>
-                            {properties.map((p, index) => {
-                                const tier = tierConfig(p.tier);
-                                return (
-                                    <div key={p.id} style={styles.card}>
-                                        {/* Rank Badge */}
-                                        <div style={styles.rankBadge}>#{index + 1}</div>
+                    <div style={styles.grid}>
+                        {properties.map((p, index) => {
+                            const tier = tierConfig(p.tier);
+                            const sc = scoreColor(p.tier);
+                            return (
+                                <div key={p.id} className="th-card" style={{...styles.card, transition:'all 0.25s ease'}}>
 
-                                        {/* Tier Badge */}
-                                        <div style={{...styles.tierBadge, background: tier.bg, color: tier.color}}>
-                                            {tier.icon} {p.tier || 'Unranked'}
+                                    {/* Card Image Area */}
+                                    <div style={{...styles.cardImg, background: tier.bg}}>
+                                        <span style={styles.cardImgIcon}>
+                                            {p.type === 'studio' ? '🏢' : p.type === 'condo' ? '🏙️' : p.type === 'house' ? '🏡' : p.type === 'room' ? '🚪' : '🏠'}
+                                        </span>
+                                        <div style={styles.cardRank}>#{index + 1}</div>
+                                        <div style={{...styles.tierBadge, background: tier.bg, color: tier.color, border: `0.5px solid ${tier.color}30`}}>
+                                            {tier.label}
+                                        </div>
+                                    </div>
+
+                                    {/* Card Body */}
+                                    <div style={styles.cardBody}>
+                                        <div style={styles.cardHeader}>
+                                            <h3 style={styles.cardTitle}>{p.title}</h3>
+                                            {p.ranking_score && (
+                                                <span style={{...styles.cardScore, color: sc}}>{p.ranking_score}/100</span>
+                                            )}
                                         </div>
 
-                                        <h3 style={styles.cardTitle}>{p.title}</h3>
-                                        <p style={styles.cardLocation}>📍 {p.barangay ? `${p.barangay}, ` : ''}{p.city}</p>
+                                        <p style={styles.cardLocation}>
+                                            📍 {p.barangay ? `${p.barangay}, ` : ''}{p.city}
+                                        </p>
 
                                         <div style={styles.cardPrice}>
                                             ₱{Number(p.monthly_rent).toLocaleString()}
-                                            <span style={styles.perMonth}>/month</span>
+                                            <span style={styles.perMonth}> / month</span>
                                         </div>
 
-                                        <div style={styles.cardDetails}>
-                                            <span style={styles.detail}>🛏 {p.bedrooms} Bed</span>
-                                            <span style={styles.detail}>🚿 {p.bathrooms} Bath</span>
-                                            <span style={styles.detail}>🏠 {p.type}</span>
+                                        <div style={styles.cardMeta}>
+                                            <span style={styles.metaItem}>🛏 {p.bedrooms} bed</span>
+                                            <span style={styles.metaDot}></span>
+                                            <span style={styles.metaItem}>🚿 {p.bathrooms} bath</span>
+                                            <span style={styles.metaDot}></span>
+                                            <span style={styles.metaItem}>🏠 {p.type}</span>
                                         </div>
 
-                                        <div style={styles.divider}></div>
+                                        <div style={styles.cardDivider}></div>
 
                                         <div style={styles.amenities}>
                                             {p.has_wifi && <span style={styles.tag}>📶 WiFi</span>}
@@ -130,84 +183,90 @@ export default function Properties() {
                                             {p.has_aircon && <span style={styles.tag}>❄️ Aircon</span>}
                                             {p.is_furnished && <span style={styles.tag}>🛋️ Furnished</span>}
                                             {p.has_parking && <span style={styles.tag}>🚗 Parking</span>}
-                                            {p.is_pet_friendly && <span style={styles.tag}>🐾 Pet Friendly</span>}
+                                            {p.is_pet_friendly && <span style={styles.tag}>🐾 Pets OK</span>}
                                         </div>
 
                                         {p.ranking_score && (
-                                            <div style={styles.scoreSection}>
-                                                <div style={styles.scoreHeader}>
-                                                    <span style={styles.scoreLabel}>Match Score</span>
-                                                    <span style={{...styles.scoreValue, color: tier.color}}>{p.ranking_score}/100</span>
-                                                </div>
-                                                <div style={styles.barBg}>
-                                                    <div style={{
-                                                        ...styles.barFill,
-                                                        width: `${p.ranking_score}%`,
-                                                        background: tier.color
-                                                    }}></div>
+                                            <div style={styles.scoreWrap}>
+                                                <div style={styles.scoreBar}>
+                                                    <div style={{...styles.scoreFill, width:`${p.ranking_score}%`, background: sc}}></div>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
-                                );
-                            })}
-                        </div>
-                    </>
+                                </div>
+                            );
+                        })}
+                    </div>
                 )}
             </div>
 
-            <style>{`
-                @keyframes spin {
-                    to { transform: rotate(360deg); }
-                }
-            `}</style>
+            {/* Footer */}
+            <footer style={styles.footer}>
+                <span style={styles.footerLogo}>TierHome</span>
+                <span style={styles.footerText}>Smart Housing · Budget-Based Rankings · Angeles City</span>
+            </footer>
         </div>
     );
 }
 
 const styles = {
-    page: { minHeight:'100vh', background:'#f8fafc', fontFamily:"'Segoe UI', sans-serif" },
-    navbar: { display:'flex', justifyContent:'space-between', alignItems:'center', padding:'1rem 2rem', background:'white', boxShadow:'0 1px 4px rgba(0,0,0,0.08)', position:'sticky', top:0, zIndex:100 },
-    navBrand: { fontSize:'1.4rem', fontWeight:'700', color:'#2d6a4f' },
-    navRight: { display:'flex', alignItems:'center', gap:'1.5rem' },
-    userBadge: { display:'flex', alignItems:'center', gap:'0.75rem' },
-    userAvatar: { width:'36px', height:'36px', background:'#2d6a4f', color:'white', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontWeight:'700', fontSize:'1rem' },
-    userName: { fontWeight:'600', fontSize:'0.9rem', color:'#1a1a2e' },
-    userRole: { fontSize:'0.75rem', color:'#888', textTransform:'capitalize' },
-    logoutBtn: { padding:'0.5rem 1.25rem', background:'white', color:'#dc2626', border:'1px solid #dc2626', borderRadius:'8px', cursor:'pointer', fontWeight:'600', fontSize:'0.9rem' },
-    hero: { background:'linear-gradient(160deg, #2d6a4f, #52b788)', padding:'3rem 2rem', textAlign:'center', color:'white' },
-    heroTitle: { fontSize:'2.2rem', fontWeight:'700', margin:'0 0 0.5rem 0' },
-    heroSubtitle: { opacity:0.85, margin:'0 0 2rem 0', fontSize:'1rem' },
-    searchBox: { display:'flex', alignItems:'center', background:'white', borderRadius:'12px', padding:'0.5rem', maxWidth:'560px', margin:'0 auto', boxShadow:'0 4px 20px rgba(0,0,0,0.15)' },
-    searchIcon: { padding:'0 0.75rem', color:'#2d6a4f', fontWeight:'700', fontSize:'1.2rem' },
-    searchInput: { flex:1, border:'none', outline:'none', fontSize:'1rem', padding:'0.5rem', color:'#333' },
-    searchBtn: { padding:'0.65rem 1.5rem', background:'#2d6a4f', color:'white', border:'none', borderRadius:'8px', fontWeight:'600', cursor:'pointer', fontSize:'0.95rem' },
-    legend: { display:'flex', justifyContent:'center', gap:'2rem', marginTop:'1.5rem', fontSize:'0.9rem', opacity:0.9 },
-    legendItem: { display:'flex', alignItems:'center', gap:'0.4rem' },
-    content: { padding:'2rem', maxWidth:'1200px', margin:'0 auto' },
-    loadingWrapper: { textAlign:'center', padding:'4rem' },
-    loadingSpinner: { width:'40px', height:'40px', border:'4px solid #e2e8f0', borderTop:'4px solid #2d6a4f', borderRadius:'50%', animation:'spin 1s linear infinite', margin:'0 auto 1rem' },
-    loadingText: { color:'#888' },
-    emptyState: { textAlign:'center', padding:'4rem', color:'#555' },
-    emptyIcon: { fontSize:'4rem', margin:'0 0 1rem 0' },
-    resultsCount: { color:'#666', marginBottom:'1.5rem', fontSize:'0.95rem' },
-    grid: { display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(320px, 1fr))', gap:'1.5rem' },
-    card: { background:'white', borderRadius:'16px', padding:'1.5rem', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', border:'1px solid #f0f0f0' },
-    rankBadge: { position:'absolute', top:'1rem', left:'1rem', background:'#1a1a2e', color:'white', width:'28px', height:'28px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.75rem', fontWeight:'700' },
-    tierBadge: { display:'inline-block', padding:'0.3rem 0.8rem', borderRadius:'20px', fontSize:'0.8rem', fontWeight:'600', marginBottom:'0.75rem', marginLeft:'2rem' },
-    cardTitle: { fontSize:'1.1rem', fontWeight:'700', color:'#1a1a2e', margin:'0 0 0.4rem 0' },
-    cardLocation: { color:'#888', fontSize:'0.9rem', margin:'0 0 0.75rem 0' },
-    cardPrice: { fontSize:'1.5rem', fontWeight:'700', color:'#2d6a4f', margin:'0 0 0.75rem 0' },
-    perMonth: { fontSize:'0.9rem', fontWeight:'400', color:'#888' },
-    cardDetails: { display:'flex', gap:'1rem', fontSize:'0.85rem', color:'#555', margin:'0 0 1rem 0' },
-    detail: { display:'flex', alignItems:'center', gap:'0.3rem' },
-    divider: { height:'1px', background:'#f0f0f0', margin:'1rem 0' },
-    amenities: { display:'flex', flexWrap:'wrap', gap:'0.4rem', marginBottom:'1rem' },
-    tag: { background:'#f8fafc', border:'1px solid #e2e8f0', padding:'0.2rem 0.6rem', borderRadius:'20px', fontSize:'0.78rem', color:'#555' },
-    scoreSection: { marginTop:'0.5rem' },
-    scoreHeader: { display:'flex', justifyContent:'space-between', marginBottom:'0.4rem' },
-    scoreLabel: { fontSize:'0.85rem', color:'#888' },
-    scoreValue: { fontSize:'0.85rem', fontWeight:'700' },
-    barBg: { background:'#f0f0f0', borderRadius:'10px', height:'6px' },
-    barFill: { height:'6px', borderRadius:'10px', transition:'width 0.5s ease' },
+    page: { minHeight:'100vh', background:'#f4f6f8', fontFamily:"'DM Sans', sans-serif", display:'flex', flexDirection:'column' },
+    navbar: { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 32px', background:'#ffffff', borderBottom:'0.5px solid #eaecef', position:'sticky', top:0, zIndex:100, gap:'16px' },
+    navBrand: { display:'flex', alignItems:'center', gap:'10px', flexShrink:0 },
+    navLogoBox: { width:'36px', height:'36px', borderRadius:'10px', background:'linear-gradient(135deg, #1D9E75, #0F6E56)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'18px', boxShadow:'0 4px 12px rgba(29,158,117,0.3)' },
+    navLogoText: { fontFamily:"'Playfair Display', serif", fontSize:'20px', color:'#0a1628', fontWeight:'600', letterSpacing:'-0.5px' },
+    navCenter: { flex:1, display:'flex', justifyContent:'center', maxWidth:'500px', margin:'0 auto' },
+    navSearchBar: { display:'flex', alignItems:'center', border:'0.5px solid #dde3ea', borderRadius:'40px', overflow:'hidden', background:'#f8fafc', width:'100%' },
+    navSearchIcon: { padding:'0 12px', color:'#1D9E75', fontWeight:'500', fontSize:'15px' },
+    navSearchInput: { flex:1, border:'none', background:'transparent', padding:'10px 8px', fontSize:'14px', color:'#0a1628', fontFamily:"'DM Sans', sans-serif" },
+    navSearchBtn: { background:'#1D9E75', border:'none', color:'white', padding:'10px 20px', fontWeight:'500', fontSize:'13px', cursor:'pointer', fontFamily:"'DM Sans', sans-serif", borderRadius:'40px', margin:'4px' },
+    navRight: { display:'flex', alignItems:'center', gap:'12px', flexShrink:0 },
+    userPill: { display:'flex', alignItems:'center', gap:'10px' },
+    userAvatar: { width:'34px', height:'34px', borderRadius:'50%', background:'#0a1628', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'14px', fontWeight:'500' },
+    userInfo: { display:'flex', flexDirection:'column' },
+    userName: { fontSize:'13px', fontWeight:'500', color:'#0a1628', lineHeight:1.2 },
+    userRole: { fontSize:'11px', color:'#8a96a3', textTransform:'capitalize' },
+    logoutBtn: { padding:'8px 16px', background:'white', color:'#8a96a3', border:'0.5px solid #dde3ea', borderRadius:'8px', cursor:'pointer', fontSize:'13px', fontWeight:'500', fontFamily:"'DM Sans', sans-serif", transition:'all 0.2s' },
+    hero: { background:'#0a1628', padding:'40px 32px' },
+    heroInner: { maxWidth:'800px', margin:'0 auto', animation:'fadeIn 0.8s ease both' },
+    heroTitle: { fontFamily:"'Playfair Display', serif", fontSize:'36px', color:'#ffffff', fontWeight:'600', margin:'0 0 10px', letterSpacing:'-0.5px', lineHeight:1.2 },
+    heroAccent: { color:'#1D9E75', fontStyle:'italic' },
+    heroSub: { fontSize:'15px', color:'rgba(255,255,255,0.5)', fontWeight:'300', margin:'0 0 20px' },
+    tierLegend: { display:'flex', gap:'24px', flexWrap:'wrap' },
+    legendItem: { display:'flex', alignItems:'center', gap:'8px', fontSize:'13px', color:'rgba(255,255,255,0.6)' },
+    legendDot: { width:'8px', height:'8px', borderRadius:'50%', display:'inline-block' },
+    content: { flex:1, padding:'32px', maxWidth:'1280px', width:'100%', margin:'0 auto', boxSizing:'border-box' },
+    loadingWrap: { textAlign:'center', padding:'80px 0' },
+    spinner: { width:'36px', height:'36px', border:'3px solid #eaecef', borderTop:'3px solid #1D9E75', borderRadius:'50%', animation:'spin 0.8s linear infinite', margin:'0 auto 16px' },
+    loadingText: { color:'#8a96a3', fontSize:'14px', fontWeight:'300' },
+    emptyWrap: { textAlign:'center', padding:'80px 0' },
+    emptyIcon: { fontSize:'48px', marginBottom:'16px' },
+    emptyTitle: { fontFamily:"'Playfair Display', serif", fontSize:'22px', color:'#0a1628', margin:'0 0 8px' },
+    emptyText: { color:'#8a96a3', fontSize:'14px', fontWeight:'300' },
+    grid: { display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:'20px' },
+    card: { background:'#ffffff', borderRadius:'20px', overflow:'hidden', border:'0.5px solid #eaecef', boxShadow:'0 2px 12px rgba(0,0,0,0.05)' },
+    cardImg: { height:'140px', display:'flex', alignItems:'center', justifyContent:'center', position:'relative' },
+    cardImgIcon: { fontSize:'48px' },
+    cardRank: { position:'absolute', top:'12px', right:'12px', width:'26px', height:'26px', borderRadius:'50%', background:'rgba(10,22,40,0.7)', color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'11px', fontWeight:'500' },
+    tierBadge: { position:'absolute', top:'12px', left:'12px', padding:'4px 10px', borderRadius:'20px', fontSize:'11px', fontWeight:'500' },
+    cardBody: { padding:'16px 18px 18px' },
+    cardHeader: { display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'6px' },
+    cardTitle: { fontSize:'15px', fontWeight:'500', color:'#0a1628', margin:0, flex:1, paddingRight:'8px' },
+    cardScore: { fontSize:'13px', fontWeight:'500', flexShrink:0 },
+    cardLocation: { fontSize:'12px', color:'#8a96a3', margin:'0 0 10px', fontWeight:'300' },
+    cardPrice: { fontSize:'18px', fontWeight:'500', color:'#0a1628', margin:'0 0 10px' },
+    perMonth: { fontSize:'13px', fontWeight:'300', color:'#8a96a3' },
+    cardMeta: { display:'flex', alignItems:'center', gap:'8px', fontSize:'12px', color:'#8a96a3', marginBottom:'12px' },
+    metaItem: { whiteSpace:'nowrap' },
+    metaDot: { width:'3px', height:'3px', borderRadius:'50%', background:'#dde3ea', flexShrink:0 },
+    cardDivider: { height:'0.5px', background:'#f0f2f4', margin:'12px 0' },
+    amenities: { display:'flex', flexWrap:'wrap', gap:'6px', marginBottom:'12px' },
+    tag: { fontSize:'11px', color:'#5a6472', background:'#f4f6f8', padding:'4px 8px', borderRadius:'20px', border:'0.5px solid #eaecef' },
+    scoreWrap: { marginTop:'4px' },
+    scoreBar: { height:'4px', background:'#f0f2f4', borderRadius:'4px' },
+    scoreFill: { height:'4px', borderRadius:'4px', transition:'width 0.6s ease' },
+    footer: { padding:'24px 32px', borderTop:'0.5px solid #eaecef', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#ffffff', marginTop:'auto' },
+    footerLogo: { fontFamily:"'Playfair Display', serif", fontSize:'16px', color:'#0a1628', fontWeight:'600' },
+    footerText: { fontSize:'12px', color:'#aab0b8', fontWeight:'300' },
 };
