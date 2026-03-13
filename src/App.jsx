@@ -3,6 +3,7 @@ import Splash from './pages/Splash';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Properties from './pages/Properties';
+import AddProperty from './pages/AddProperty';
 
 const PrivateRoute = ({ children }) => {
     const token = localStorage.getItem('token');
@@ -16,11 +17,8 @@ export default function App() {
                 <Route path="/" element={<Splash />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/properties" element={
-                    <PrivateRoute>
-                        <Properties />
-                    </PrivateRoute>
-                } />
+                <Route path="/properties" element={<PrivateRoute><Properties /></PrivateRoute>} />
+                <Route path="/add-property" element={<PrivateRoute><AddProperty /></PrivateRoute>} />
             </Routes>
         </BrowserRouter>
     );
