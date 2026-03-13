@@ -274,6 +274,5 @@ const styles = {
     footer: { padding:'24px 32px', borderTop:'0.5px solid #eaecef', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#ffffff', marginTop:'auto' },
     footerLogo: { fontFamily:"'Playfair Display', serif", fontSize:'16px', color:'#0a1628', fontWeight:'600' },
     footerText: { fontSize:'12px', color:'#aab0b8', fontWeight:'300' },
-    addBtn: { padding:'8px 16px', background:'#1D9E75', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'13px', fontWeight:'500', fontFamily:"'DM Sans', sans-serif" },
-
+    addBtn: { padding:'8px 16px', background:'#1D9E75', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontSize:'13px', fontWeight:'500', fontFamily:"'DM Sans', sans-serif" }
 };
